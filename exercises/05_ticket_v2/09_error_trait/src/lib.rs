@@ -3,7 +3,6 @@
 //  The docs for the `std::fmt` module are a good place to start and look for examples:
 //  https://doc.rust-lang.org/std/fmt/index.html#write
 
-use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
 
 enum TicketNewError {
@@ -11,7 +10,7 @@ enum TicketNewError {
     DescriptionError(String),
 }
 
-impl Error for TicketNewError {
+impl std::error::Error for TicketNewError {
 }
 
 impl Debug for TicketNewError {
@@ -40,7 +39,7 @@ fn easy_ticket(title: String, description: String, status: Status) -> Ticket {
         Ok(ticket) => ticket,
         Err(error) => {
             match error {
-                TicketNewError::TitleError(message) => panic!(format!("{message}")),
+                TicketNewError::TitleError(message) => panic!("{message}"),
                 TicketNewError::DescriptionError(_) =>
                     Ticket::new(title, "Description not provided".to_string(), status).unwrap(),
             }
