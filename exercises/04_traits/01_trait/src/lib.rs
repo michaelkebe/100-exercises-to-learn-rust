@@ -3,6 +3,24 @@
 //
 // Then implement the trait for `u32` and `i32`.
 
+macro_rules! impl_is_even {
+    ($a:ty) => {
+        impl IsEven for $a {
+            fn is_even(&self) -> bool {
+                //gregerg
+                self % 2 == 0
+            }
+        }
+    };
+}
+
+trait IsEven {
+    fn is_even(&self) -> bool;
+}
+
+impl_is_even!(u32);
+impl_is_even!(i32);
+
 #[cfg(test)]
 mod tests {
     use super::*;
