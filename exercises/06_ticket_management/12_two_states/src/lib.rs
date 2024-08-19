@@ -6,6 +6,7 @@
 // You also need to add a `get` method that takes as input a `TicketId`
 // and returns an `Option<&Ticket>`.
 
+use rand::random;
 use ticket_fields::{TicketDescription, TicketTitle};
 
 #[derive(Clone)]
@@ -22,6 +23,18 @@ pub struct Ticket {
     pub title: TicketTitle,
     pub description: TicketDescription,
     pub status: Status,
+}
+
+impl From<TicketDraft> for Ticket {
+    fn from(draft: TicketDraft) -> Self {
+        let ticket_id = TicketId(random::<u64>());
+        Self {
+            title: draft.title,
+            description: draft.description,
+            id: ticket_id,
+            status: Status::ToDo
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -44,8 +57,15 @@ impl TicketStore {
         }
     }
 
-    pub fn add_ticket(&mut self, ticket: Ticket) {
+    pub fn add_ticket(&mut self, ticket_draft: TicketDraft) -> TicketId {
+        let ticket: Ticket = ticket_draft.into();
+        let id = ticket.id;
         self.tickets.push(ticket);
+        id
+    }
+
+    pub fn get(&self, id: TicketId) -> Option<&Ticket> {
+        self.tickets.iter().find(|&t| t.id == id)
     }
 }
 
