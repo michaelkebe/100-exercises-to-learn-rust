@@ -6,12 +6,12 @@
 // You also need to add a `get` method that takes as input a `TicketId`
 // and returns an `Option<&Ticket>`.
 
-use rand::random;
 use ticket_fields::{TicketDescription, TicketTitle};
 
 #[derive(Clone)]
 pub struct TicketStore {
     tickets: Vec<Ticket>,
+    id_counter: u64,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -23,18 +23,6 @@ pub struct Ticket {
     pub title: TicketTitle,
     pub description: TicketDescription,
     pub status: Status,
-}
-
-impl From<TicketDraft> for Ticket {
-    fn from(draft: TicketDraft) -> Self {
-        let ticket_id = TicketId(random::<u64>());
-        Self {
-            title: draft.title,
-            description: draft.description,
-            id: ticket_id,
-            status: Status::ToDo
-        }
-    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -54,14 +42,21 @@ impl TicketStore {
     pub fn new() -> Self {
         Self {
             tickets: Vec::new(),
+            id_counter: 0,
         }
     }
 
-    pub fn add_ticket(&mut self, ticket_draft: TicketDraft) -> TicketId {
-        let ticket: Ticket = ticket_draft.into();
-        let id = ticket.id;
+    pub fn add_ticket(&mut self, draft: TicketDraft) -> TicketId {
+        let id = self.id_counter;
+        self.id_counter += 1;
+        let ticket = Ticket {
+            id: TicketId(id),
+            title: draft.title,
+            description: draft.description,
+            status: Status::ToDo,
+        };
         self.tickets.push(ticket);
-        id
+        TicketId(id)
     }
 
     pub fn get(&self, id: TicketId) -> Option<&Ticket> {
